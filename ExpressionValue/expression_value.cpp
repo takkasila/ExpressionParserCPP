@@ -2,6 +2,7 @@
 #include <string>
 #include <assert.h>
 #include <stdio.h>
+#include <math.h>
 
 using namespace std;
 
@@ -79,56 +80,103 @@ int getSymbol()
 	return sym;
 }
 
-void expression();
+int expression();
 
-void factor()
+int factor()
 {
 	// factor = constant | "(" , expression , ")";
+	int res = 0;
 	assert((sym == Number) || (sym == LParen));
 	if (sym == Number)
+	{
+		res = val;
 		sym = getSymbol();
+	}
 	else
 	{
 		sym = getSymbol();
-		expression();
+		res = expression();
 		assert(sym == RParen);
 		sym = getSymbol();
 	}
+	return res;
 }
 
-void preFactor()
+int preFactor()
 {
 	// preFactor = factor , { "^" , factor };
-	factor();
+	int res = 0;
+	res = factor();
 	while (sym == Power)
 	{
 		sym = getSymbol();
-		factor();
+		res = pow(res, factor());
 	}
+	return res;
 }
 
-void term()
+int term()
 {
 	//term = preFactor, { ("*" | "/" | "%"), preFactor };
-	preFactor();
+	int res = 0;
+	res = preFactor();
+
 	while (sym == Times || sym == Divide || sym == Mod)
 	{
-		sym = getSymbol();
-		preFactor();
+		switch (sym)
+		{
+			case Times:
+				sym = getSymbol();	
+				res *= preFactor();
+				break;
+			case Divide:
+				sym = getSymbol();
+				res /= preFactor();
+				break;
+			case Mod:
+				sym = getSymbol();
+				res %= preFactor();
+				break;
+		}
 	}
+	return res;
 }
 
-void expression()
+int expression()
 {
 	//expression = ["+" | "-"], term, { ("+" | "-"), term };
-	if (sym == Plus || sym == Minus)
-		sym = getSymbol();
-	term();
+	int positivity = 1;
+	int res = 0;
+
+	switch (sym)
+	{
+		case Plus:
+			positivity = 1;
+			sym = getSymbol();
+			break;
+		case Minus:
+			positivity = -1;
+			sym = getSymbol();
+			break;
+	}
+
+	res = positivity * term();
+
 	while (sym == Plus || sym == Minus)
 	{
+		switch (sym)
+		{
+			case Plus:
+				positivity = 1;
+				break;
+			case Minus:
+				positivity = -1;
+				break;
+		}
 		sym = getSymbol();
-		term();
+		res += positivity * term();
 	}
+	return res;
 }
 
 int main()
@@ -137,10 +185,11 @@ int main()
 	ch = getchar();
 
 	sym = getSymbol();
-	expression();
+	int res = expression();
 
 	assert(sym == EndLine);
 	cout << "Succesfully parsed an expression." << endl;
+	cout << "Result: " << res;
 	getchar();
 	return 0;
 }
