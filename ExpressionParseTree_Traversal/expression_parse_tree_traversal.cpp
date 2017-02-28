@@ -356,6 +356,11 @@ int main()
 	cout << "Succesfully parsed an expression." << endl;
 	printExpressionTree(root, 0);
 
+	cout << "Prefix:" << endl;
+	prefix_traversal(root);
+	cout << "Infix:" << endl;
+	infix_traversal(root);
+	cout << "Postfix:" << endl;
 	postfix_traversal(root);
 
 	getchar();
