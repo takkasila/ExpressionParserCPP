@@ -169,6 +169,139 @@ public:
 			break;
 		}
 	}
+
+	void optimize()
+	{
+		if (left == NULL || right == NULL)
+			return;
+		if (left != NULL)
+			left->optimize();
+		if (right != NULL)
+			right->optimize();
+		//0*f
+		if (kind == Times && ((left->kind == Number && left->val == 0) || (right->kind == Number && right->val == 0)))
+		{
+			kind = Number;
+			val = 0;
+			left = NULL;
+			right = NULL;
+		}
+		//0+f
+		else if (kind == Plus && left->kind == Number && left->val == 0 )
+		{
+			kind = right->kind;
+			val = right->val;
+			if (right->kind != Number && right->kind != Var)
+			{
+				left = right->left;
+				right = right->right;
+			}
+			else
+			{
+				left = NULL;
+				right = NULL;
+			}
+		}
+		//f+0
+		else if (kind == Plus && right->kind == Number && right->val == 0)
+		{
+			kind = left->kind;
+			val = left->val;
+			if (left->kind != Number && left->kind != Var)
+			{
+				right = left->right;
+				left = left->left;
+			}
+			else
+			{
+				left = NULL;
+				right = NULL;
+			}
+		}
+		//1*f
+		else if (kind == Times && left->kind == Number && left->val == 1)
+		{
+			kind = right->kind;
+			val = right->val;
+			if (right->kind != Number && right->kind != Var)
+			{
+				left = right->left;
+				right = right->right;
+			}
+			else
+			{
+				left = NULL;
+				right = NULL;
+			}
+		}
+		//f*1
+		else if (kind == Times && right->kind == Number && right->val == 1)
+		{
+			kind = left->kind;
+			val = left->val;
+			if (left->kind != Number && left->kind != Var)
+			{
+				right = left->right;
+				left = left->left;
+			}
+			else
+			{
+				left = NULL;
+				right = NULL;
+			}
+		}
+		//f-f
+		//f+f
+		else if ((left->kind == Number || left->kind == Var) && (right->kind == Number || right->kind == Var)
+			&& left->val == right->val
+			&& left->kind == right->kind)
+		{
+			switch (kind)
+			{
+			case Plus:
+			{
+				Node *two = new Node();
+				two->kind = Number;
+				two->val = 2;
+				left = two;
+				kind = Times;
+				break;
+			}
+			case Minus:
+			{
+				kind = Number;
+				val = 0;
+				left = NULL;
+				right = NULL;
+				break;
+			}
+			}
+		}
+		//f^1
+		else if (kind == Power && right->kind == Number && right->val == 1)
+		{
+			kind = left->kind;
+			val = left->val;
+			if (left->kind != Number && left->kind != Var)
+			{
+				right = left->right;
+				left = left->left;
+			}
+			else
+			{
+				left = NULL;
+				right = NULL;
+			}
+		}
+		//f^0
+		else if (kind == Power && right->kind == Number && right->val == 0)
+		{
+			kind = Number;
+			val = 1;
+			left = NULL;
+			right = NULL;
+		}
+	}
 };
 
 void getNumber()
@@ -436,6 +569,9 @@ int main()
 	printExpressionTree(root, 0);
 	root->diff();
 	cout << "Diff Expression Tree: " << endl;
+	printExpressionTree(root, 0);
+	cout << "Optimized Expression Tree: " << endl;
+	root->optimize();
 	printExpressionTree(root, 0);
 	getchar();
 	return 0;

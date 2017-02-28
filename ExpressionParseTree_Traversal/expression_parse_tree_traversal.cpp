@@ -311,7 +311,6 @@ void symbolMap(Node *node)
 
 void prefix_traversal(Node *node)
 {
-	cout << "(";
 	symbolMap(node);
 	if (node->left != NULL)
 		prefix_traversal(node->left);
@@ -320,7 +319,6 @@ void prefix_traversal(Node *node)
 
 	if (node->right != NULL)
 		prefix_traversal(node->right);
-	cout << ")";
 }
 
 void infix_traversal(Node *node)
@@ -338,13 +336,11 @@ void infix_traversal(Node *node)
 
 void postfix_traversal(Node *node)
 {
-	cout << "(";
 	if (node->left != NULL)
 		postfix_traversal(node->left);
 	if (node->right != NULL)
 		postfix_traversal(node->right);
 	symbolMap(node);
-	cout << ")";
 }
 
 int main()
