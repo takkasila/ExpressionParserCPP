@@ -554,6 +554,50 @@ void printExpressionTree(Node *node, int level)
 		printExpressionTree(node->left, level + 1);
 }
 
+void symbolMap(Node *node)
+{
+	switch (node->kind)
+	{
+	case Plus:
+		cout << "+";
+		break;
+	case Minus:
+		cout << "-";
+		break;
+	case Times:
+		cout << "*";
+		break;
+	case Divide:
+		cout << "/";
+		break;
+	case Mod:
+		cout << "%";
+		break;
+	case Power:
+		cout << "^";
+		break;
+	case Number:
+		cout << node->val;
+		break;
+	case Var:
+		cout << (char) node->val;
+		break;
+	}
+}
+
+void infix_traversal(Node *node)
+{
+	cout << "(";
+	if (node->left != NULL)
+		infix_traversal(node->left);
+
+	symbolMap(node);
+
+	if (node->right != NULL)
+		infix_traversal(node->right);
+	cout << ")";
+}
+
 int main()
 {
 	Node *root = new Node();
@@ -573,6 +617,8 @@ int main()
 	cout << "Optimized Expression Tree: " << endl;
 	root->optimize();
 	printExpressionTree(root, 0);
+	cout << "Optimized Expression Tree Linear form (Infix): " << endl;
+	infix_traversal(root);
 	getchar();
 	return 0;
 }
