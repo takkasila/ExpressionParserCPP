@@ -281,6 +281,72 @@ void printExpressionTree(Node *node, int level)
 		printExpressionTree(node->left, level + 1);
 }
 
+void symbolMap(Node *node)
+{
+	switch (node->kind)
+	{
+	case Plus:
+		cout << "+";
+		break;
+	case Minus:
+		cout << "-";
+		break;
+	case Times:
+		cout << "*";
+		break;
+	case Divide:
+		cout << "/";
+		break;
+	case Mod:
+		cout << "%";
+		break;
+	case Power:
+		cout << "^";
+		break;
+	case Number:
+		cout << node->val;
+		break;
+	}
+}
+
+void prefix_traversal(Node *node)
+{
+	cout << "(";
+	symbolMap(node);
+	if (node->left != NULL)
+		prefix_traversal(node->left);
+
+	
+
+	if (node->right != NULL)
+		prefix_traversal(node->right);
+	cout << ")";
+}
+
+void infix_traversal(Node *node)
+{
+	cout << "(";
+	if (node->left != NULL)
+		infix_traversal(node->left);
+
+	symbolMap(node);
+
+	if (node->right != NULL)
+		infix_traversal(node->right);
+	cout << ")";
+}
+
+void postfix_traversal(Node *node)
+{
+	cout << "(";
+	if (node->left != NULL)
+		postfix_traversal(node->left);
+	if (node->right != NULL)
+		postfix_traversal(node->right);
+	symbolMap(node);
+	cout << ")";
+}
+
 int main()
 {
 	Node *root = new Node();
@@ -293,6 +359,9 @@ int main()
 	assert(sym == EndLine);
 	cout << "Succesfully parsed an expression." << endl;
 	printExpressionTree(root, 0);
+
+	postfix_traversal(root);
+
 	getchar();
 	return 0;
 }
